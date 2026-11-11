@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#123b2d">
+<title>Smart Food AI</title>
+<style>
+:root{--green:#176b4b;--green2:#23966a;--ink:#18352b;--muted:#718078;--bg:#f3f7f4;--card:#fff;--line:#e4ece6;--orange:#e79b39;--red:#d65c52}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif;color:var(--ink)}
+header{background:linear-gradient(120deg,#103c2d,#1b7955);color:white;padding:22px max(18px,calc((100% - 1180px)/2));display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:12px}.logo{width:42px;height:42px;border-radius:14px;background:#ffffff20;display:grid;place-items:center;font-size:23px}.brand h1{font-size:20px;margin:0}.brand small{opacity:.8}
+select,button,input{font:inherit}header select{background:#ffffff18;color:white;border:1px solid #ffffff55;border-radius:10px;padding:9px}header option{color:#18352b}
+main{max-width:1180px;margin:26px auto;padding:0 18px}.welcome{display:flex;justify-content:space-between;align-items:end;gap:16px;flex-wrap:wrap;margin-bottom:20px}.welcome h2{margin:0 0 5px;font-size:26px}.welcome p{margin:0;color:var(--muted)}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}.card{background:var(--card);border:1px solid var(--line);border-radius:17px;padding:18px;box-shadow:0 5px 18px #163c2b08}.metric-label{color:var(--muted);font-size:13px}.metric{font-size:29px;font-weight:750;margin:8px 0 3px}.metric-note{font-size:12px;color:var(--green2)}
+.layout{display:grid;grid-template-columns:1.3fr .7fr;gap:16px;margin-top:16px}.section-title{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}.section-title h3{margin:0;font-size:17px}
+.btn{border:0;border-radius:10px;background:var(--green);color:white;padding:10px 14px;cursor:pointer;font-weight:650}.btn:hover{background:#10563c}.btn.secondary{background:#eaf4ee;color:var(--green)}.btn.danger{background:#fff0ef;color:var(--red)}
+.table-wrap{overflow-x:auto}table{width:100%;border-collapse:collapse;min-width:510px}th,td{text-align:left;padding:12px 9px;border-bottom:1px solid var(--line);font-size:13px}th{color:var(--muted);font-weight:600}.pill{display:inline-block;padding:5px 8px;border-radius:20px;background:#eaf5ee;color:#1d744f;font-size:11px}.pill.warn{background:#fff3df;color:#a56814}.pill.bad{background:#ffedeb;color:#b7463e}
+form{display:grid;gap:10px}label{font-size:12px;color:var(--muted);display:grid;gap:5px}input{width:100%;padding:11px;border:1px solid var(--line);border-radius:10px;background:#fbfdfb;color:var(--ink)}.form-row{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.bar-list{display:grid;gap:13px}.bar-label{display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px}.bar{height:9px;background:#edf2ee;border-radius:20px;overflow:hidden}.bar span{display:block;height:100%;background:linear-gradient(90deg,#26966a,#80c99e);border-radius:20px}
+.tip{background:#f0f8f2;border:1px solid #dceee1;border-radius:13px;padding:13px;font-size:13px;line-height:1.5;margin-top:12px}.tip strong{color:var(--green)}
+footer{text-align:center;color:#8a9890;font-size:12px;padding:30px 15px}
+.empty{text-align:center;color:var(--muted);padding:22px}
+@media(max-width:850px){.grid{grid-template-columns:repeat(2,1fr)}.layout{grid-template-columns:1fr}}
+@media(max-width:480px){header{padding:16px}.brand h1{font-size:18px}main{margin:18px auto;padding:0 12px}.welcome h2{font-size:22px}.grid{gap:9px}.card{padding:14px}.metric{font-size:25px}.form-row{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header>
+ <div class="brand"><div class="logo">🥬</div><div><h1>Smart Food AI</h1><small data-i="subtitle">Умное управление продуктами</small></div></div>
+ <select id="lang" aria-label="Language"><option value="ru">Русский</option><option value="kk">Қазақша</option><option value="en">English</option></select>
+</header>
+<main>
+ <div class="welcome"><div><h2 data-i="welcome">Панель управления</h2><p data-i="desc">Следите за запасами и сокращайте пищевые отходы.</p></div><button class="btn secondary" id="demoBtn" data-i="demo">Загрузить демо-данные</button></div>
+ <section class="grid">
+  <div class="card"><div class="metric-label" data-i="products">Всего продуктов</div><div class="metric" id="total">0</div><div class="metric-note" data-i="productsNote">в вашем списке</div></div>
+  <div class="card"><div class="metric-label" data-i="expiring">Скоро истекает срок</div><div class="metric" id="soon">0</div><div class="metric-note" data-i="expiringNote">в ближайшие 3 дня</div></div>
+  <div class="card"><div class="metric-label" data-i="waste">Пищевые отходы</div><div class="metric" id="wasteTotal">0 кг</div><div class="metric-note" data-i="wasteNote">зафиксировано всего</div></div>
+  <div class="card"><div class="metric-label" data-i="saved">Потенциальная экономия</div><div class="metric" id="saved">0 ₸</div><div class="metric-note" data-i="savedNote">оценка по запасам</div></div>
+ </section>
+ <section class="layout">
+  <div class="card">
+   <div class="section-title"><h3 data-i="inventory">Список продуктов</h3><button class="btn" id="showForm" data-i="add">+ Добавить</button></div>
+   <div id="formArea" hidden>
+    <form id="productForm">
+     <label><span data-i="productName">Название продукта</span><input id="pname" required maxlength="50" placeholder="Например, молоко"></label>
+     <div class="form-row">
+      <label><span data-i="quantity">Количество (кг/л/шт.)</span><input id="qty" type="number" min="0.1" step="0.1" required></label>
+      <label><span data-i="expiry">Годен до</span><input id="expiry" type="date" required></label>
+     </div>
+     <div class="form-row">
+      <label><span data-i="price">Стоимость (₸)</span><input id="price" type="number" min="0" step="1" value="0"></label>
+      <label><span data-i="category">Категория</span><input id="category" maxlength="30" placeholder="Молочные продукты"></label>
+     </div>
+     <div style="display:flex;gap:8px"><button class="btn" type="submit" data-i="save">Сохранить продукт</button><button class="btn secondary" type="button" id="cancel" data-i="cancel">Отмена</button></div>
+    </form><hr style="border:0;border-top:1px solid var(--line);margin:16px 0">
+   </div>
+   <div class="table-wrap"><table><thead><tr><th data-i="name">Продукт</th><th data-i="qtyShort">Кол-во</th><th data-i="date">Срок</th><th data-i="status">Статус</th><th data-i="actions">Действие</th></tr></thead><tbody id="productsBody"></tbody></table></div>
+  </div>
+  <div class="card">
+   <div class="section-title"><h3 data-i="addWaste">Учёт отходов</h3></div>
+   <form id="wasteForm">
+    <label><span data-i="wasteAmount">Количество отходов (кг)</span><input id="wqty" type="number" min="0.1" step="0.1" required placeholder="0.5"></label>
+    <label><span data-i="reason">Причина</span><input id="reason" maxlength="60" placeholder="Например, испортился продукт"></label>
+    <button class="btn" type="submit" data-i="record">Записать отходы</button>
+   </form>
+   <div class="tip"><strong data-i="aiTitle">AI-рекомендация</strong><br><span id="recommendation">Добавьте продукты, и система подскажет, какие из них лучше использовать в первую очередь.</span></div>
+  </div>
+ </section>
+ <section class="layout">
+  <div class="card">
+   <div class="section-title"><h3 data-i="analytics">Аналитика запасов</h3><span class="pill" data-i="live">Обновляется автоматически</span></div>
+   <div class="bar-list" id="analyticsBars"></div>
+  </div>
+  <div class="card">
+   <div class="section-title"><h3 data-i="history">История отходов</h3></div>
+   <div id="wasteHistory" class="empty">Пока нет записей</div>
+  </div>
+ </section>
+</main>
+<footer>Smart Food AI · Hackathon prototype · Данные сохраняются на этом устройстве</footer>
+<script>
+const dict={
+ru:{subtitle:"Умное управление продуктами",welcome:"Панель управления",desc:"Следите за запасами и сокращайте пищевые отходы.",demo:"Загрузить демо-данные",products:"Всего продуктов",productsNote:"в вашем списке",expiring:"Скоро истекает срок",expiringNote:"в ближайшие 3 дня",waste:"Пищевые отходы",wasteNote:"зафиксировано всего",saved:"Потенциальная экономия",savedNote:"оценка по запасам",inventory:"Список продуктов",add:"+ Добавить",productName:"Название продукта",quantity:"Количество (кг/л/шт.)",expiry:"Годен до",price:"Стоимость (₸)",category:"Категория",save:"Сохранить продукт",cancel:"Отмена",name:"Продукт",qtyShort:"Кол-во",date:"Срок",status:"Статус",actions:"Действие",addWaste:"Учёт отходов",wasteAmount:"Количество отходов (кг)",reason:"Причина",record:"Записать отходы",aiTitle:"AI-рекомендация",analytics:"Аналитика запасов",live:"Обновляется автоматически",history:"История отходов",empty:"Пока нет записей",useSoon:"Использовать скоро",expired:"Срок истёк",ok:"В норме",delete:"Удалить",noProducts:"Пока нет продуктов. Добавьте первый продукт.",noWaste:"Пока нет записей",recommend:"Скоро истекает срок у: ",recommendNone:"Сроки ваших продуктов под контролем. Продолжайте обновлять список.",wasteRecorded:"Запись добавлена."},
+kk:{subtitle:"Өнімдерді ақылды басқару",welcome:"Басқару панелі",desc:"Қорларды бақылап, тағам қалдықтарын азайтыңыз.",demo:"Демо деректерді жүктеу",products:"Барлық өнім",productsNote:"тізіміңізде",expiring:"Мерзімі жақында бітеді",expiringNote:"алдағы 3 күнде",waste:"Тағам қалдықтары",wasteNote:"жалпы тіркелгені",saved:"Ықтимал үнем",savedNote:"қор бойынша есеп",inventory:"Өнімдер тізімі",add:"+ Қосу",productName:"Өнім атауы",quantity:"Мөлшері (кг/л/дана)",expiry:"Жарамдылық мерзімі",price:"Бағасы (₸)",category:"Санат",save:"Өнімді сақтау",cancel:"Бас тарту",name:"Өнім",qtyShort:"Саны",date:"Мерзімі",status:"Күйі",actions:"Әрекет",addWaste:"Қалдықтарды есепке алу",wasteAmount:"Қалдық мөлшері (кг)",reason:"Себебі",record:"Қалдықты тіркеу",aiTitle:"AI кеңесі",analytics:"Қорлар талдауы",live:"Автоматты жаңартылады",history:"Қалдықтар тарихы",empty:"Әзірге жазба жоқ",useSoon:"Жақында пайдаланыңыз",expired:"Мерзімі өтті",ok:"Қалыпты",delete:"Жою",noProducts:"Өнім жоқ. Алғашқы өнімді қосыңыз.",noWaste:"Әзірге жазба жоқ",recommend:"Мерзімі жақында бітетін өнімдер: ",recommendNone:"Өнімдердің мерзімі бақылауда. Тізімді жаңартып отырыңыз.",wasteRecorded:"Жазба қосылды."},
+en:{subtitle:"Smart product management",welcome:"Dashboard",desc:"Track inventory and reduce food waste.",demo:"Load demo data",products:"Total products",productsNote:"in your list",expiring:"Expiring soon",expiringNote:"within 3 days",waste:"Food waste",wasteNote:"total recorded",saved:"Potential savings",savedNote:"inventory estimate",inventory:"Product inventory",add:"+ Add product",productName:"Product name",quantity:"Quantity (kg/l/pcs)",expiry:"Best before",price:"Price (₸)",category:"Category",save:"Save product",cancel:"Cancel",name:"Product",qtyShort:"Qty",date:"Expiry",status:"Status",actions:"Action",addWaste:"Waste tracking",wasteAmount:"Waste amount (kg)",reason:"Reason",record:"Record waste",aiTitle:"AI recommendation",analytics:"Inventory analytics",live:"Auto-updated",history:"Waste history",empty:"No records yet",useSoon:"Use soon",expired:"Expired",ok:"Good",delete:"Delete",noProducts:"No products yet. Add your first product.",noWaste:"No records yet",recommend:"Products expiring soon: ",recommendNone:"Your products are under control. Keep the list updated.",wasteRecorded:"Record added."}
+};
+let products=JSON.parse(localStorage.getItem("sfa_products")||"[]");
+let waste=JSON.parse(localStorage.getItem("sfa_waste")||"[]");
+let lang=localStorage.getItem("sfa_lang")||"ru";
+const $=id=>document.getElementById(id), t=k=>dict[lang][k]||k;
+function save(){localStorage.setItem("sfa_products",JSON.stringify(products));localStorage.setItem("sfa_waste",JSON.stringify(waste));render()}
+function daysLeft(date){return Math.ceil((new Date(date+"T23:59:59")-new Date())/86400000)}
+function status(p){let d=daysLeft(p.expiry);return d<0?["bad",t("expired")]:d<=3?["warn",t("useSoon")]:["",t("ok")]}
+function render(){
+ $("lang").value=lang;document.querySelectorAll("[data-i]").forEach(el=>el.textContent=t(el.dataset.i));
+ $("total").textContent=products.length;
+ $("soon").textContent=products.filter(p=>daysLeft(p.expiry)<=3).length;
+ const totalWaste=waste.reduce((s,w)=>s+Number(w.qty),0);$("wasteTotal").textContent=totalWaste.toFixed(1)+" кг";
+ $("saved").textContent=products.reduce((s,p)=>s+Number(p.price||0),0).toLocaleString("ru-RU")+" ₸";
+ $("productsBody").innerHTML=products.length?products.map(p=>{let [cls,label]=status(p);return `<tr><td><b>${esc(p.name)}</b><br><small style="color:#829087">${esc(p.category||"—")}</small></td><td>${p.qty}</td><td>${p.expiry}</td><td><span class="pill ${cls}">${label}</span></td><td><button class="btn danger" onclick="removeProduct('${p.id}')">${t("delete")}</button></td></tr>`}).join(""):`<tr><td colspan="5" class="empty">${t("noProducts")}</td></tr>`;
+ const exp=products.filter(p=>daysLeft(p.expiry)<=3&&daysLeft(p.expiry)>=0).sort((a,b)=>daysLeft(a.expiry)-daysLeft(b.expiry));
+ $("recommendation").textContent=exp.length?t("recommend")+exp.map(p=>p.name).join(", "):t("recommendNone");
+ const categories={};products.forEach(p=>categories[p.category||"Other"]=(categories[p.category||"Other"]||0)+Number(p.qty));
+ const entries=Object.entries(categories).sort((a,b)=>b[1]-a[1]);
+ $("analyticsBars").innerHTML=entries.length?entries.map(([name,val])=>`<div><div class="bar-label"><span>${esc(name)}</span><b>${val}</b></div><div class="bar"><span style="width:${Math.max(4,val/Math.max(...entries.map(x=>x[1]))*100)}%"></span></div></div>`).join(""):`<div class="empty">${t("noProducts")}</div>`;
+ $("wasteHistory").innerHTML=waste.length?waste.slice().reverse().slice(0,6).map(w=>`<div style="padding:10px 0;border-bottom:1px solid var(--line);font-size:13px"><b>${w.qty} кг</b> · ${esc(w.reason||"—")}<div style="color:#87938c;font-size:11px">${w.date}</div></div>`).join(""):`<div class="empty">${t("noWaste")}</div>`;
+}
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+window.removeProduct=id=>{products=products.filter(p=>p.id!==id);save()};
+$("lang").addEventListener("change",e=>{lang=e.target.value;localStorage.setItem("sfa_lang",lang);render()});
+$("showForm").onclick=()=>{$("formArea").hidden=false;$("pname").focus()};
+$("cancel").onclick=()=>{$("formArea").hidden=true;$("productForm").reset()};
+$("productForm").onsubmit=e=>{e.preventDefault();products.push({id:Date.now().toString(),name:$("pname").value.trim(),qty:Number($("qty").value),expiry:$("expiry").value,price:Number($("price").value||0),category:$("category").value.trim()});save();e.target.reset();$("formArea").hidden=true};
+$("wasteForm").onsubmit=e=>{e.preventDefault();waste.push({qty:Number($("wqty").value),reason:$("reason").value.trim(),date:new Date().toLocaleDateString()});save();e.target.reset()};
+$("demoBtn").onclick=()=>{if(products.length&&!confirm("Replace current inventory with demo data?"))return;let d=new Date();const date=n=>{let x=new Date(d);x.setDate(x.getDate()+n);return x.toISOString().slice(0,10)};products=[{id:"d1",name:"Milk",qty:8,expiry:date(1),price:3200,category:"Dairy"},{id:"d2",name:"Apples",qty:12,expiry:date(5),price:4500,category:"Fruit"},{id:"d3",name:"Bread",qty:5,expiry:date(2),price:1800,category:"Bakery"},{id:"d4",name:"Carrots",qty:7,expiry:date(9),price:2100,category:"Vegetables"}];waste=[{qty:1.2,reason:"Demo record",date:new Date().toLocaleDateString()}];save()};
+render();
+</script>
+</body></html>
